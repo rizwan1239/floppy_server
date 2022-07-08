@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 router.use('/floppys', require('./floppys'));
+router.use('/uploads', require('./uploads'));
 
 router.use((req, res, next) => {
   const err = new Error('Route not found!!');
