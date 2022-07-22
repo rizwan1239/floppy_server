@@ -6,13 +6,7 @@ router.post('/:name', async (req, res, next) => {
   try {
     const name = req.params.name;
     const body = req.body.song;
-    const body64 = JSON.stringify(btoa(body));
-    // const audioFile = new Moralis.File(`${name}.wav`, {
-    //   base64: body64,
-    // });
-    // await audioFile.saveIPFS();
-    // const audioHash = audioFile.hash();
-    // console.log(audioHash);
+    const body64 = Buffer.from(body).toString('base64');
     const Upload = Moralis.Object.extend('Upload');
     const upload = new Upload();
     upload.set('time', new Date().toISOString());
