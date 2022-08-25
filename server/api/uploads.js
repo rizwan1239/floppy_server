@@ -1,7 +1,5 @@
 const router = require('express').Router();
 const Moralis = require('moralis/node');
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
 
 // POST /api/uploads/:address
 router.post('/:address', async (req, res, next) => {
