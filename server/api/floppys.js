@@ -1,19 +1,30 @@
 const router = require('express').Router();
-const Moralis = require('moralis/node');
+const { db } = require('../../firebase');
 
 // GET /api/floppys/:id
 router.get('/:id', async (req, res, next) => {
   try {
-    const query = new Moralis.Query('Sample');
-    query.equalTo('unlocked', true);
-    query.equalTo('floppy', parseInt(req.params.id));
+    const snapshot = db.collection('floppys');
 
-    const query2 = new Moralis.Query('Sample');
-    query2.equalTo('unlocked', false);
-    query2.equalTo('floppy', parseInt(req.params.id));
+    const queryUnlocked = await snapshot
+      .where('floppy', '==', parseInt(`${req.params.id}`))
+      .where('unlocked', '==', true)
+      .get();
 
-    const unlockedSamples = await query.find();
-    const lockedSamples = await query2.find();
+    const unlockedSamples = [];
+    queryUnlocked.forEach((doc) => {
+      unlockedSamples.push(doc.data());
+    });
+
+    const queryLocked = await snapshot
+      .where('floppy', '==', parseInt(`${req.params.id}`))
+      .where('unlocked', '==', false)
+      .get();
+
+    const lockedSamples = [];
+    queryLocked.forEach((doc) => {
+      lockedSamples.push(doc.id);
+    });
 
     const result = { locked: lockedSamples.length, unlocked: unlockedSamples };
 
@@ -26,21 +37,35 @@ router.get('/:id', async (req, res, next) => {
 // PUT /api/floppys/:id
 router.put('/:id', async (req, res, next) => {
   try {
-    const query = new Moralis.Query('Sample');
-    query.equalTo('unlocked', false);
-    query.equalTo('floppy', parseInt(req.params.id));
-    const locked = await query.find();
+    const snapshot = db.collection('floppys');
 
-    if (locked.length) {
-      await locked[0].set('unlocked', true);
-      await locked[0].save();
+    const queryLocked = await snapshot
+      .where('floppy', '==', parseInt(`${req.params.id}`))
+      .where('unlocked', '==', false)
+      .get();
+
+    const lockedSamples = [];
+    queryLocked.forEach((doc) => {
+      lockedSamples.push(doc.id);
+    });
+
+    if (lockedSamples.length) {
+      await snapshot.doc(lockedSamples[0]).update({ unlocked: true });
     }
 
-    const secondQuery = new Moralis.Query('Sample');
-    secondQuery.equalTo('unlocked', true);
-    secondQuery.equalTo('floppy', parseInt(req.params.id));
-    const unlockedSamples = await secondQuery.find();
-    const lockedSamplesCount = locked.length ? locked.length - 1 : 0;
+    const queryUnlocked = await snapshot
+      .where('floppy', '==', parseInt(`${req.params.id}`))
+      .where('unlocked', '==', true)
+      .get();
+
+    const unlockedSamples = [];
+    queryUnlocked.forEach((doc) => {
+      unlockedSamples.push(doc.data());
+    });
+
+    const lockedSamplesCount = lockedSamples.length
+      ? lockedSamples.length - 1
+      : 0;
 
     const result = { locked: lockedSamplesCount, unlocked: unlockedSamples };
 

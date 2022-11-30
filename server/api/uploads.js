@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const Moralis = require('moralis/node');
+const { db } = require('../../firebase');
 
 // POST /api/uploads/:address
 router.post('/:address', async (req, res, next) => {
@@ -8,21 +8,14 @@ router.post('/:address', async (req, res, next) => {
     const song = JSON.parse(req.body.song);
     const repaired = song.base64File.split(' ').join('+');
 
-    const Upload = Moralis.Object.extend('Upload');
-    const upload = new Upload();
-    upload.set('time', new Date().toISOString());
-    upload.set('address', address);
-    upload.set('name', song.FileName);
-    upload.set('wavBase64', repaired);
-    upload.save().then(
-      (upload) => {
-        res.send('ok');
-      },
-      (error) => {
-        console.log(error);
-        res.send('error');
-      }
-    );
+    const result = await db.collection('uploads').add({
+      time: new Date().toISOString(),
+      address: address,
+      name: song.FileName,
+      wavBase64: repaired,
+    });
+
+    res.send(result.id);
   } catch (error) {
     console.log(error);
     next(error);
