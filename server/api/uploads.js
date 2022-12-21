@@ -1,18 +1,32 @@
 const router = require('express').Router();
 const { db } = require('../../firebase');
 
-// POST /api/uploads/:address
-router.post('/:address', async (req, res, next) => {
+// POST /api/uploads/:name
+router.post('/:name', async (req, res, next) => {
   try {
-    const address = req.params.address;
-    const song = JSON.parse(req.body.song);
-    const repaired = song.base64File.split(' ').join('+');
+    const name = req.params.name;
+    const ip = req.headers['x-forwarded-for'];
+    const repaired = req.body.song.split(' ').join('+');
+
+    const bufferStream = new stream.PassThrough();
+    bufferStream.end(Buffer.from(repaired, 'base64'));
+
+    const file = bucket.file(`${name}.wav`);
+
+    bufferStream
+      .pipe(file.createWriteStream())
+      .on('error', (e) => {
+        console.log(e);
+      })
+      .on('finish', () => {
+        console.log(`file uploaded successfully`);
+      });
 
     const result = await db.collection('uploads').add({
       time: new Date().toISOString(),
-      address: address,
-      name: song.FileName,
-      wavBase64: repaired,
+      ip: ip,
+      name: name,
+      pathRef: `${name}.wav`,
     });
 
     res.send(result.id);
