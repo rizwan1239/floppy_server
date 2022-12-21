@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { db } = require('../../firebase');
+const { db, bucket } = require('../../firebase');
 const stream = require('stream');
 
 // POST /api/uploads/:name
