@@ -2,14 +2,16 @@ const router = require('express').Router();
 const { db, bucket } = require('../../firebase');
 const stream = require('stream');
 
-// POST /api/uploads/:name
-router.post('/:name/:download', async (req, res, next) => {
+// POST /api/:download flag
+router.post('/:download', async (req, res, next) => {
   try {
-    const name = req.params.name;
-    const download = req.params.download === '1' ? true : false
-
     const ip = req.headers['x-forwarded-for'];
-    const repaired = req.body.song.split(' ').join('+');
+    const download = req.params.download === '1' ? true : false
+    
+    const bodyParts = req.body.song.split('#')
+    const name = bodyParts[1];
+    
+    const repaired = bodyParts[0].split(' ').join('+');
 
     const bufferStream = new stream.PassThrough();
     bufferStream.end(Buffer.from(repaired, 'base64'));
