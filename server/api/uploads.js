@@ -3,9 +3,11 @@ const { db, bucket } = require('../../firebase');
 const stream = require('stream');
 
 // POST /api/uploads/:name
-router.post('/:name', async (req, res, next) => {
+router.post('/:name/:download', async (req, res, next) => {
   try {
     const name = req.params.name;
+    const download = req.params.download === '1' ? true : false
+
     const ip = req.headers['x-forwarded-for'];
     const repaired = req.body.song.split(' ').join('+');
 
@@ -24,10 +26,11 @@ router.post('/:name', async (req, res, next) => {
       });
 
     const result = await db.collection('uploads').add({
-      time: new Date().toISOString(),
+      time: new Date().toLocaleString(),
       ip: ip,
       name: name,
       pathRef: `${name}.wav`,
+      download: download
     });
 
     res.send(result.id);
