@@ -13,33 +13,62 @@ router.post('/:download', async (req, res, next) => {
     
     const repaired = bodyParts[0].split(' ').join('+');
 
-    const bufferStream = new stream.PassThrough();
-    bufferStream.end(Buffer.from(repaired, 'base64'));
+    const contentString = `data:audio/wav;base64, ${repaired}`
 
-    const file = bucket.file(`${name}.wav`);
+    const options = {
+      method: 'POST',
+      url: 'https://deep-index.moralis.io/api/v2/ipfs/uploadFolder',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'X-API-Key': process.env.MORALIS_API_KEY,
+      },
+      data: [
+        {
+          content: contentString,
+          path: `${name}.wav`,
+        },
+      ],
+    };
+    
+    const { data } = await axios.request(options);
+    const hash = data[0].path;
 
-    bufferStream
-      .pipe(file.createWriteStream())
-      .on('error', (e) => {
-        console.log(e);
-      })
-      .on('finish', () => {
-        console.log(`file uploaded successfully`);
-      });
-
-    const result = await db.collection('uploads').add({
+    await db.collection('uploads').add({
       time: new Date().toLocaleString(),
       ip: ip,
       name: name,
-      pathRef: `${name}.wav`,
+      hash: hash,
       download: download
     });
 
-    res.send(result.id);
+    res.send('ok');
   } catch (error) {
     console.log(error);
     next(error);
   }
 });
+
+async function uploadToIPFS(path, content){
+ 
+    const options = {
+      method: 'POST',
+      url: 'https://deep-index.moralis.io/api/v2/ipfs/uploadFolder',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'X-API-Key': process.env.MORALIS_API_KEY,
+      },
+      data: [
+        {
+          content,
+          path,
+        },
+      ],
+    };
+    const { data } = await axios.request(options);
+    const hash = data[0].path;
+    return hash
+}
 
 module.exports = router;
