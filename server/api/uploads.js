@@ -7,12 +7,11 @@ router.post('/:download', async (req, res, next) => {
   try {
     const ip = req.headers['x-forwarded-for'];
     const download = req.params.download === '1' ? true : false;
-    console.log(req.body);
-    console.log(req.body.song);
     const bodyParts = req.body.song.split('#');
     const name = bodyParts[1];
-    const songString = bodyParts[0].split('"')[1];
-    const repaired = songString.split(' ').join('+');
+    const repaired = bodyParts[0].split(' ').join('+');
+    console.log(name);
+    console.log(typeof repaired);
 
     const options = {
       method: 'POST',
