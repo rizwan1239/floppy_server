@@ -10,8 +10,6 @@ router.post('/:download', async (req, res, next) => {
     const bodyParts = req.body.song.split('#');
     const name = bodyParts[1];
     const repaired = bodyParts[0].split(' ').join('+');
-    console.log(name);
-    console.log(typeof repaired);
 
     const options = {
       method: 'POST',
@@ -43,7 +41,6 @@ router.post('/:download', async (req, res, next) => {
 
     res.send('ok');
   } catch (error) {
-    // console.log(error.message);
     next(error);
   }
 });
