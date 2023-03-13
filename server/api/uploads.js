@@ -11,6 +11,7 @@ router.post('/:download', async (req, res, next) => {
     // const name = bodyParts[1];
     // const repaired = bodyParts[0].split(' ').join('+');
     const name = req.body.path;
+    console.log(req.body);
     const repaired = req.body.content['base64File'].split(' ').join('+');
 
     const options = {
