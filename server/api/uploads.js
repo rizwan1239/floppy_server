@@ -9,11 +9,11 @@ router.post('/:download', async (req, res, next) => {
     const download = req.params.download === '1' ? true : false;
     const bodyParts = req.body.song.split('#');
     const name = bodyParts[1];
-    const repaired = bodyParts[0].split(' ').join('+');
+    const repaired = bodyParts[0].base64File.split(' ').join('+');
     // const name = req.body.path;
-    console.log(typeof repaired);
     console.log(name);
-    console.log(repaired);
+    console.log(typeof repaired);
+    // console.log(repaired);
 
     // const repaired = req.body.song.split(' ').join('+');
 
