@@ -23,6 +23,6 @@ io.on('connection', (socket) => {
     socket.on('SetRecordState', (msg, callback) => {
         console.log('Setting Recording State:', msg);
         // Sending the JSON data back to the client
-        callback(msg);
+        callback('Server is recording!');
     });
 });
