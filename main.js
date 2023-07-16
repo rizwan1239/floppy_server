@@ -19,10 +19,13 @@ io.on('connection', (socket) => {
   });
   socket.emit('message', 'welcome');
 
-    // Custom event 'getdata' listener
     socket.on('SetRecordState', (msg, callback) => {
         console.log('Setting Recording State:', msg);
-        // Sending the JSON data back to the client
-        callback('Server is recording!');
+        // Check if 'msg' is true
+        if (msg === true) {
+            callback('Server is recording!');
+        } else {
+            callback('Server is not recording!');
+        }
     });
 });
