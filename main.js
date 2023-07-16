@@ -21,6 +21,7 @@ io.on('connection', (socket) => {
 
     // Custom event 'getdata' listener
     socket.on('getdata', (data) => {
+        console.log('getting data');
         console.log('get data event with parameter:', data);
         // Sending the JSON data back to the client
         socket.emit('message', data);
