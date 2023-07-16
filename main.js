@@ -18,4 +18,10 @@ io.on('connection', (socket) => {
     console.log('socket disconnected:', reason);
   });
   socket.emit('message', 'welcome');
+
+    // Custom event 'getdata' listener
+    socket.on('getdata', () => {
+        // Sending 'Hello, World!' message to the client
+        socket.emit('message', 'Hello, World!');
+    });
 });
