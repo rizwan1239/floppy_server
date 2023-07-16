@@ -20,9 +20,8 @@ io.on('connection', (socket) => {
   socket.emit('message', 'welcome');
 
     // Custom event 'getdata' listener
-    socket.on('getdata', (msg) => {
-        console.log('getting data');
-        console.log('get data event with parameter:', msg);
+    socket.on('SetRecordState', (msg) => {
+        console.log('Setting Recording State:', msg);
         // Sending the JSON data back to the client
         socket.emit('message', msg);
     });
