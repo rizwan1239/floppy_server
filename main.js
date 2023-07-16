@@ -20,9 +20,9 @@ io.on('connection', (socket) => {
   socket.emit('message', 'welcome');
 
     // Custom event 'getdata' listener
-    socket.on('getdata', (parameter) => {
-        console.log('get data event with parameter:', parameter);
-        // Sending the parameter back to the client
-        socket.emit('message', parameter);
+    socket.on('getdata', (data) => {
+        console.log('get data event with parameter:', data);
+        // Sending the JSON data back to the client
+        socket.emit('message', data);
     });
 });
