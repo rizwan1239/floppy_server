@@ -21,6 +21,7 @@ io.on('connection', (socket) => {
 
     // Custom event 'getdata' listener
     socket.on('getdata', () => {
+        console.log('get data event');
         // Sending 'Hello, World!' message to the client
         socket.emit('message', 'Hello, World!');
     });
