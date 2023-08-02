@@ -1,31 +1,29 @@
 /* eslint-disable no-console */
 const app = require('./server');
+const http = require('http');
+const WebSocket = require('ws');
 const dotenv = require('dotenv').config();
-const socket = require('socket.io');
 
 const PORT = process.env.PORT || 3000;
+const server = http.createServer(app);
 
-const server = app.listen(PORT, () => {
-  console.log(`listening on port ${PORT}`);
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (ws) => {
+  console.log('new connection:', ws._socket.remoteAddress, ws._socket.remotePort);
+
+  ws.on('message', (message) => {
+    console.log('received message:', message);
+    // Handle incoming messages from the Unreal client here
+  });
+
+  ws.on('close', () => {
+    console.log('socket disconnected');
+  });
+
+  ws.send('welcome');
 });
 
-const io = socket(server);
-
-io.on('connection', (socket) => {
-  console.log('new connection:', socket.id);
-
-  socket.on('disconnect', (reason) => {
-    console.log('socket disconnected:', reason);
-  });
-  socket.emit('message', 'welcome');
-
-    socket.on('SetRecordState', (msg, callback) => {
-        console.log('Setting Recording State:', msg);
-        // Check if 'msg' is true
-        if (msg === true) {
-            callback('Server is recording!');
-        } else {
-            callback('Server is not recording!');
-        }
-    });
+server.listen(PORT, () => {
+  console.log(`listening on port ${PORT}`);
 });
